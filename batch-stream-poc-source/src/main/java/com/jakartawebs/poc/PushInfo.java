@@ -15,7 +15,7 @@ import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name="push_info")
+@Table(name="poc_push_info")
 @SuppressWarnings("serial")
 public class PushInfo implements Serializable {
 	@Id

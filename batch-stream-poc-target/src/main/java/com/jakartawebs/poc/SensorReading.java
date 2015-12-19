@@ -5,10 +5,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -16,12 +13,10 @@ import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name="sensor_reading")
+@Table(name="poc_sensor_reading")
 @SuppressWarnings("serial")
 public class SensorReading implements Serializable {
 	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="sensor_reading_id_seq")
-	@SequenceGenerator(name="sensor_reading_id_seq", sequenceName="sensor_reading_id_seq")
 	@Column(name="id")
 	private Long id;
 	

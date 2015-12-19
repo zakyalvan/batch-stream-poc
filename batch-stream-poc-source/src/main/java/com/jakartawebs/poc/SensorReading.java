@@ -16,7 +16,7 @@ import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name="sensor_reading")
+@Table(name="poc_sensor_reading")
 @SuppressWarnings("serial")
 public class SensorReading implements Serializable {
 	@Id

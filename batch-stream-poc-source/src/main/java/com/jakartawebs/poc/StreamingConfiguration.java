@@ -2,8 +2,6 @@ package com.jakartawebs.poc;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.jms.ConnectionFactory;
@@ -27,13 +25,13 @@ import org.springframework.batch.integration.launch.JobLaunchingGateway;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.orm.JpaQueryProvider;
 import org.springframework.batch.item.support.CompositeItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.annotation.IntegrationComponentScan;
@@ -74,14 +72,11 @@ public class StreamingConfiguration {
 		@Autowired
 		private JobLauncher jobLauncher;
 		
-		@Autowired
-		private JavaMailSender javaMailSender;
-		
 		@Bean
 		public MessageSource<PushInfo> pushInfoSource() {
 			return new MessageSource<PushInfo>() {
 				private static final String COUNT_QUERY_STRING = "SELECT COUNT(pi) FROM PushInfo AS pi WHERE pi.lastExecution=:lastExecution";
-				private static final String QUERY_STRING = "FROM PushInfo AS pi WHERE pi.lastExecution=:lastExecution";
+				private static final String FETCH_QUERY_STRING = "FROM PushInfo AS pi WHERE pi.lastExecution=:lastExecution";
 				
 				@PersistenceContext
 				private EntityManager entityManager;
@@ -103,7 +98,7 @@ public class StreamingConfiguration {
 						return MessageBuilder.withPayload(entityManager.merge(pushInfo)).build();
 					}
 					else {
-						PushInfo pushInfo = entityManager.createQuery(QUERY_STRING, PushInfo.class)
+						PushInfo pushInfo = entityManager.createQuery(FETCH_QUERY_STRING, PushInfo.class)
 								.setParameter("lastExecution", true)
 								.getSingleResult();
 						
@@ -161,7 +156,11 @@ public class StreamingConfiguration {
 			};
 		}
 		
+		@Autowired(required=false)
+		private JavaMailSender javaMailSender;
+		
 		@Bean
+		@ConditionalOnBean(value=JavaMailSender.class)
 		public MessageHandler mailSendingMessageHandler() {
 			return new MailSendingMessageHandler(javaMailSender);
 		}
@@ -172,7 +171,7 @@ public class StreamingConfiguration {
 					.transform(pushInfoToJobLaunchRequest())
 					.handle(jobLaunchingGateway())
 					.transform(jobExecutionToMailMessage())
-					.handle(mailSendingMessageHandler())
+					//.handle(mailSendingMessageHandler())
 					.get();
 		}
 	}

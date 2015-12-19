@@ -6,7 +6,7 @@
 		<artifactId>batch-stream-poc</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>batch-stream-target</artifactId>
+	<artifactId>batch-stream-poc-target</artifactId>
 
 	<dependencies>
 		<dependency>
